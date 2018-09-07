@@ -67,19 +67,19 @@ func fileComment(for module: String, type: String) -> String {
 let contractFileContent = """
 \(fileComment(for: module, type: "Contract"))
 
-import UIkit
+import UIKit
 
 protocol \(module)View: class {
 
-var presenter: \(module)Presentation? { get set }
+    var presenter: \(module)Presentation? { get set }
 
 }
 
 protocol \(module)Presentation: class {
 
-var view: \(module)View? { get set }
-var presenter: \(module)Presentation? { get set }
-var router: \(module)WireFrame? { get set }
+    var view: \(module)View? { get set }
+    var router: \(module)WireFrame? { get set }
+    var interactor: \(module)UseCase? { get set }
 
 }
 
@@ -90,9 +90,9 @@ protocol \(module)UseCase: class {
 
 protocol \(module)WireFrame: class {
 
-var view: UIViewController? { get set }
+    var viewController: UIViewController? { get set }
 
-static func assembleModule() -> UIViewController
+    static func assembleModule() -> UIViewController
 
 }
 
@@ -102,23 +102,24 @@ static func assembleModule() -> UIViewController
 let viewControllerFileContent = """
 \(fileComment(for: module, type: "ViewController"))
 
-import UIkit
+import UIKit
 
 class \(module)ViewController: BaseViewController, \(module)View {
 
-//MARK: Properties
-var presenter: \(module)Presentation?
+    //MARK: Properties
 
-//MARK: UI Elments
+    var presenter: \(module)Presentation?
+
+    //MARK: UI Elments
 
 
-//MARK: Object LifeCycle
+    //MARK: Object LifeCycle
 
-override func initialize() {
+    override func initialize() {
 
-}
+    }
 
-//MARK: SetupView
+    //MARK: SetupView
 
 
 }
@@ -145,11 +146,11 @@ import Foundation
 
 class \(module)Presenter: \(module)Presentation {
 
-weak var view: \(module)View? { get set }
+    weak var view: \(module)View?
 
-var presenter: \(module)Presentation? { get set }
+    var router: \(module)WireFrame?
 
-var router: \(module)WireFrame? { get set }
+    var interactor: \(module)UseCase?
 
 }
 
@@ -163,25 +164,24 @@ import UIKit
 
 class \(module)Router: \(module)WireFrame {
 
-weak var viewController: UIViewController?
+    weak var viewController: UIViewController?
 
-static func assembleModule() -> UIViewController {
+    static func assembleModule() -> UIViewController {
+        let view = \(module)ViewController()
+        let presenter = \(module)Presenter()
+        let router = \(module)Router()
+        let interacter = \(module)Interacter()
 
-let view = \(module)ViewController()
-let presenter = \(module)Presenter()
-let router = \(module)Router()
-let interacter = \(module)Interacter()
+        view.presenter = presenter
 
-view.presenter = presenter
+        presenter.view = view
+        presenter.router = router
+        presenter.interactor = interacter
 
-presenter.view = view
-presenter.router = router
-presenter.interacter = interacter
+        router.viewController = view
 
-router.viewController = view
-
-return view
-}
+        return view
+    }
 
 }
 
