@@ -10,7 +10,7 @@ guard CommandLine.arguments.count > 1 else {
 func getUserName(_ args: String...) -> String {
     let task = Process()
     let pipe = Pipe()
-
+    
     task.standardOutput = pipe
     task.standardError = pipe
     task.launchPath = "/usr/bin/env"
@@ -29,11 +29,13 @@ let fileManager = FileManager.default
 
 //MARK: URL
 let workUrl           = URL(fileURLWithPath: fileManager.currentDirectoryPath, isDirectory: true)
+let moduleUrl         = workUrl.appendingPathComponent(module)
+
 let contractUrl       = moduleUrl.appendingPathComponent("Contract")
 let viewUrl           = moduleUrl.appendingPathComponent("View")
-let interactorUrl      = implmentationsUrl.appendingPathComponent("Interactor")
-let routerUrl         = implmentationsUrl.appendingPathComponent("Router")
-let presenterUrl      = implmentationsUrl.appendingPathComponent("Presenter")
+let interactorUrl      = moduleUrl.appendingPathComponent("Interactor")
+let routerUrl         = moduleUrl.appendingPathComponent("Router")
+let presenterUrl      = moduleUrl.appendingPathComponent("Presenter")
 
 let contractFileUrl   = contractUrl.appendingPathComponent(module+"Contract").appendingPathExtension("swift")
 let viewFileUrl   = viewUrl.appendingPathComponent(module+"ViewController").appendingPathExtension("swift")
@@ -188,15 +190,9 @@ return view
 //MARK: Write file
 
 do {
-    try [contractUrl, viewUrl, interactorUrl, presenterUrl, routerUrl].forEach {
+    try [moduleUrl, contractUrl, viewUrl, interactorUrl, presenterUrl, routerUrl].forEach {
         try fileManager.createDirectory(at: $0, withIntermediateDirectories: true, attributes: nil)
     }
-    
-    try contractFileUrl.write(to: contractUrl, atomically: true, encoding: .utf8)
-    try viewFileUrl.write(to: viewUrl, atomically: true, encoding: .utf8)
-    try interactorFileUrl.write(to: interactorUrl, atomically: true, encoding: .utf8)
-    try presenterFileUrl.write(to: presenterUrl, atomically: true, encoding: .utf8)
-    try routerFileUrl.write(to: routerUrl, atomically: true, encoding: .utf8)
     
     try contractFileContent.write(to: contractFileUrl, atomically: true, encoding: .utf8)
     try viewControllerFileContent.write(to: viewFileUrl, atomically: true, encoding: .utf8)
